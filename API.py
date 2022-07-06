@@ -54,6 +54,31 @@ def db_operation_createtable():
             mydb.close()
 
 
+@app.route('/create_table1', methods=['POST']) # for calling the API from Postman/SOAPUI
+def db_operation_createtable1():
+    if (request.method=='POST'):
+        host1 = request.json['host']
+        user1=  request.json['userid']
+        password1=request.json['password']
+        dbname = request.json['database']
+        table_name = request.json['tablename']
+
+        try:
+            mydb = connection.connect(host=host1, user=user1, passwd=password1, use_pure=True)
+            cursor = mydb.cursor()  # create a cursor to execute queries
+            fields = request.json['fields']
+            dtypefields = request.json['dtypefields']
+            dlengths = request.json['dlengths']
+            for i in range(0,4) :
+                create_table_query = "CREATE TABLE" + " " + dbname + "." + table_name + "(" + fields[i] + " " + dtypefields[i]+" ("+str(dlengths[i])+" )"
+                print(create_table_query)
+                cursor.execute(create_table_query)
+                return jsonify(cursor.fetchall())
+        except Exception as e:
+            return jsonify(str(e))
+        finally:
+            mydb.close()
+
 @app.route('/insert_single_record', methods=['POST']) # for calling the API from Postman/SOAPUI
 def db_operation_insert_single_record():
     if (request.method=='POST'):
