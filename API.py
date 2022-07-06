@@ -72,6 +72,7 @@ def db_operation_insert_single_record():
             insert_single_record_query = "INSERT INTO" + " " + dbname1 + "." + table_name1 + " values(" + str(val1) +", " + "'" + val2 +"'" + ");"
             print(insert_single_record_query)
             cursor.execute(insert_single_record_query)
+            mydb.commit()
             return jsonify(cursor.fetchall())
         except Exception as e:
             return jsonify(str(e))
@@ -94,15 +95,37 @@ def db_operation_update_single_record():
         try:
             mydb = connection.connect(host=host1, user=user1, passwd=password1, use_pure=True)
             cursor = mydb.cursor()  # create a cursor to execute queries
-            # insert_table_query = "insert into student_table values(10,'Ravi Dubey', 19830115,'10-C');"
-            update_single_record_query = "update" + " " + dbname1 + "." + table_name1 + " set "  + dfield1 + " = " +"'" + val1 + "'" + ";"
+            update_single_record_query = "update" + " " + dbname1 + "." + table_name1 + " set "  + dfield1 + " = " +"'" + val1 + "'"
             print(update_single_record_query)
             cursor.execute(update_single_record_query)
+            mydb.commit()
             return jsonify(cursor.fetchall())
         except Exception as e:
             return jsonify(str(e))
         finally:
             mydb.close()
+
+@app.route('/select_record', methods=['POST']) # for calling the API from Postman/SOAPUI
+def db_operation_select_record():
+    if (request.method=='POST'):
+        host1 = request.json['host']
+        user1=  request.json['userid']
+        password1=request.json['password']
+        dbname1 = request.json['database']
+        table_name1 = request.json['tablename']
+
+        try:
+            mydb = connection.connect(host=host1, user=user1, passwd=password1, use_pure=True)
+            cursor = mydb.cursor()  # create a cursor to execute queries
+            select_record_query = "select " + "*  from " + dbname1 + "." + table_name1
+            print(select_record_query)
+            cursor.execute(select_record_query)
+            return jsonify(cursor.fetchall())
+        except Exception as e:
+            return jsonify(str(e))
+        finally:
+            mydb.close()
+
 
 if __name__ == '__main__':
     app.run()
